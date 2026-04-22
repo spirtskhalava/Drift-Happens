@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Customer } from './core/entities/customer.entity';
 import { Segment } from './core/entities/segment.entity';
 import { SegmentMembership } from './core/entities/membership.entity';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -16,7 +17,15 @@ import { SegmentMembership } from './core/entities/membership.entity';
       entities: [Customer, Segment, SegmentMembership],
       synchronize: true,
     }),
-    
+   BullModule.forRoot({
+      redis: {
+        host: '127.0.0.1',
+        port: 6379,
+    },
+   }),
+   BullModule.registerQueue({
+      name: 'segment-calculation',
+   }), 
   ],
 })
 export class AppModule {}

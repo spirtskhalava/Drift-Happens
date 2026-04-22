@@ -8,11 +8,14 @@ export class Segment {
   @Column()
   name: string;
 
+  @Column({ type: 'simple-array', nullable: true })
+  dependsOn: string[];
+
   @Column({ type: 'enum', enum: ['dynamic', 'static'] })
   type: string;
 
   @Column({ type: 'jsonb' })
-  rules: any; // მაგ: { "minSpent": 5000 }
+  rules: any;
 
   @CreateDateColumn()
   createdAt: Date;
