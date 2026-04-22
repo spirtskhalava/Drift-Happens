@@ -81,4 +81,11 @@ export class SegmentsService {
     const customers = await query.getMany();
     return customers.map(c => c.id);
   }
+    async getSegmentMembers(segmentId: string) {
+    return await this.customerRepo
+      .createQueryBuilder('customer')
+      .innerJoin(SegmentMembership, 'm', 'm.customerId = customer.id')
+      .where('m.segmentId = :segmentId', { segmentId })
+      .getMany();
+  }
 }
