@@ -1,11 +1,22 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { SegmentsModule } from './segments/segments.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Customer } from './core/entities/customer.entity';
+import { Segment } from './core/entities/segment.entity';
+import { SegmentMembership } from './core/entities/membership.entity';
 
 @Module({
-  imports: [SegmentsModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'user',
+      password: 'password',
+      database: 'drift_db',
+      entities: [Customer, Segment, SegmentMembership],
+      synchronize: true,
+    }),
+    
+  ],
 })
 export class AppModule {}
