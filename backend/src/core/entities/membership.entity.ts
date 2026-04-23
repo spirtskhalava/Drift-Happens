@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from 'typeorm';
 
-@Entity()
+@Entity('segment_memberships')
 @Index(['segmentId', 'customerId'], { unique: true })
 export class SegmentMembership {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'uuid' })
   segmentId: string;
 
-  @Column()
+  @Column({ type: 'uuid' })
   customerId: string;
 
   @CreateDateColumn()

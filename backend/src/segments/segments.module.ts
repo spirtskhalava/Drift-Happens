@@ -17,5 +17,6 @@ import { SegmentMembership } from '../core/entities/membership.entity';
   ],
   providers: [SegmentsService, SegmentsProcessor],
   controllers: [SegmentsController],
+  exports: [SegmentsService],
 })
 export class SegmentsModule {}

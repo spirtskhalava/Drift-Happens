@@ -1,0 +1,148 @@
+.dashboard {
+  padding: 30px;
+  background: #f4f7f6;
+  min-height: 100vh;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    background: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+
+    .status-msg {
+      margin-right: 15px;
+      color: #007bff;
+      font-weight: 500;
+    }
+  }
+}
+
+.sidebar {
+  width: 350px;
+  min-width: 350px;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  display: block !important; /* რომ დარწმუნდე რომ არ იმალება */
+}
+
+.segment-item, .card {
+  border: 1px solid #eee;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  background: #fff;
+  display: block;
+}
+.layout {
+  display: flex;
+  gap: 25px;
+}
+
+.sidebar {
+  width: 350px;
+  .card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+
+    &:hover { transform: translateY(-2px); }
+    &.active { border-color: #007bff; }
+
+    .card-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      background: #e1f5fe;
+      color: #01579b;
+      border-radius: 12px;
+      text-transform: uppercase;
+      &.static { background: #fff3e0; color: #e65100; }
+    }
+  }
+}
+
+.main {
+  flex: 1;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.btn-simulate {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-eval {
+  width: 100%;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; }
+  td { padding: 12px; border-bottom: 1px solid #eee; }
+}
+
+.empty { text-align: center; color: #999; margin-top: 50px; font-size: 18px; }
+
+.delta-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 10px 0 5px;
+  flex-wrap: wrap;
+
+  .delta-added {
+    background: #d4edda;
+    color: #155724;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .delta-removed {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .delta-time {
+    color: #999;
+    font-size: 12px;
+  }
+}

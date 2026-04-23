@@ -7,73 +7,74 @@ import { SegmentMembership } from '../core/entities/membership.entity';
 
 @Injectable()
 export class SegmentsService {
-  private readonly logger = new Logger(SegmentsService.name);
+  private readonly logger = new Logger('SegmentsService');
+  private deltaCache = new Map<string, { added: number; removed: number; evaluatedAt: Date }>();
 
   constructor(
     @InjectRepository(Customer) private customerRepo: Repository<Customer>,
     @InjectRepository(Segment) private segmentRepo: Repository<Segment>,
     @InjectRepository(SegmentMembership) private membershipRepo: Repository<SegmentMembership>,
-  ) {}
+  ) { }
+
 
   async evaluateSegment(segmentId: string) {
     const segment = await this.segmentRepo.findOne({ where: { id: segmentId } });
     if (!segment) return;
 
-    this.logger.log(`Evaluating segment: ${segment.name}`);
+    this.logger.log(`Segment: ${segment.name}`);
 
-  
     const currentIds = await this.resolveSegmentMembers(segment);
 
-   
     const oldMemberships = await this.membershipRepo.find({ where: { segmentId } });
     const oldIds = oldMemberships.map(m => m.customerId);
 
-    
     const added = currentIds.filter(id => !oldIds.includes(id));
     const removed = oldIds.filter(id => !currentIds.includes(id));
 
-    
     if (added.length === 0 && removed.length === 0) {
-      return { message: 'No changes detected', delta: { added: 0, removed: 0 } };
+      this.logger.log(`[${segment.name}] ცვლილება არ არის.`);
+      return { message: 'No changes', delta: { added: 0, removed: 0 } };
     }
 
-    
     if (added.length > 0) {
-      await this.membershipRepo.insert(added.map(id => ({ segmentId, customerId: id })));
+
+      const newEntries = added.map(id => ({ segmentId, customerId: id }));
+      await this.membershipRepo.insert(newEntries);
     }
+
     if (removed.length > 0) {
       await this.membershipRepo.delete({ segmentId, customerId: In(removed) });
     }
 
-    this.logger.log(`Segment ${segment.name} updated: +${added.length}, -${removed.length}`);
+    this.logger.log(`[${segment.name}] updated: +${added.length}, -${removed.length}`);
+    this.deltaCache.set(segmentId, { added: added.length, removed: removed.length, evaluatedAt: new Date() });
 
-    
-    const dependentSegments = await this.segmentRepo.find();
-    for (const dep of dependentSegments) {
-      if (dep.dependsOn && dep.dependsOn.includes(segmentId)) {
-        this.logger.log(`Triggering dependent segment: ${dep.name}`);
-        await this.evaluateSegment(dep.id); // რეკურსიული გამოძახება
+    const allSegments = await this.segmentRepo.find();
+    for (const depSegment of allSegments) {
+      if (depSegment.dependsOn && depSegment.dependsOn.includes(segmentId)) {
+        this.logger.log(`🔗 trigger for segment: ${depSegment.name}`);
+        await this.evaluateSegment(depSegment.id);
       }
     }
 
-    return { segment: segment.name, delta: { added, removed } };
+    return { segment: segment.name, delta: { added: added.length, removed: removed.length } };
   }
+
 
   private async resolveSegmentMembers(segment: Segment): Promise<string[]> {
     const query = this.customerRepo.createQueryBuilder('customer');
 
-    
-    if (segment.rules.minSpent) {
+    if (segment.rules && segment.rules.minSpent) {
       query.andWhere('customer.totalSpent >= :minSpent', { minSpent: segment.rules.minSpent });
     }
 
-    )
     if (segment.dependsOn && segment.dependsOn.length > 0) {
       const subQuery = this.membershipRepo
         .createQueryBuilder('m')
         .select('m.customerId')
-        .where('m.segmentId IN (:...ids)', { ids: segment.dependsOn });
-      
+        .where('m.segmentid in (:...ids)', { ids: segment.dependsOn });
+
+
       query.andWhere(`customer.id IN (${subQuery.getQuery()})`)
         .setParameters(subQuery.getParameters());
     }
@@ -81,7 +82,12 @@ export class SegmentsService {
     const customers = await query.getMany();
     return customers.map(c => c.id);
   }
-    async getSegmentMembers(segmentId: string) {
+
+  getLastDelta(segmentId: string) {
+    return this.deltaCache.get(segmentId) ?? null;
+  }
+
+  async getSegmentMembers(segmentId: string) {
     return await this.customerRepo
       .createQueryBuilder('customer')
       .innerJoin(SegmentMembership, 'm', 'm.customerId = customer.id')

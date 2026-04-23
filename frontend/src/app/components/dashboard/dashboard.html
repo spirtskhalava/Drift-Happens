@@ -1,0 +1,57 @@
+<div class="dashboard">
+  <div class="header">
+    <h2>Drift Happens</h2>
+    <div class="actions">
+      <span class="status-msg" *ngIf="message">{{ message }}</span>
+      <button class="btn-simulate" (click)="simulateTransaction()">Simulate Transactions</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <div class="card" *ngFor="let s of segments" [class.active]="selectedSegment?.id === s.id"
+        (click)="selectSegment(s)">
+        <div class="card-info">
+          <strong>{{ s.name }}</strong>
+          <span class="badge" [class.static]="s.type === 'static'">{{ s.type }}</span>
+        </div>
+        <button class="btn-eval" (click)="onEvaluate(s); $event.stopPropagation()">
+          {{ s.type === 'static' ? 'Manual Refresh' : 'Evaluate' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div *ngIf="selectedSegment; else emptyState">
+        <h3>Members in "{{ selectedSegment.name }}"</h3>
+        <div class="delta-bar" *ngIf="delta">
+          <span class="delta-added">+{{ delta.added }} added</span>
+          <span class="delta-removed">-{{ delta.removed }} removed</span>
+          <span class="delta-time">Last evaluated: {{ delta.evaluatedAt | date:'HH:mm:ss' }}</span>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Total Spent</th>
+                <th>Transactions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of members">
+                <td>{{ m.firstName }} {{ m.lastName }}</td>
+                <td>{{ m.totalSpent }}₾</td>
+                <td>{{ m.transactionCount }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p *ngIf="members.length === 0" class="no-data">No members in this segment yet.</p>
+        </div>
+      </div>
+      <ng-template #emptyState>
+        <div class="empty">Select a segment to see Delta results</div>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,7 @@
     "@nestjs/microservices": "^11.1.19",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.1",
+    "amqp-connection-manager": "^5.0.0",
     "amqplib": "^1.0.3",
     "bull": "^4.16.5",
     "pg": "^8.20.0",
